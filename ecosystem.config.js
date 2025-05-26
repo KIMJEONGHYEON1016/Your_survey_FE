@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'your-survey-frontend',
       script: 'npm',
-      args: 'run start',
+      args: 'run dev',
       cwd: '/var/lib/jenkins/workspace/survey_frontend',
       interpreter: 'none',
       env: {
