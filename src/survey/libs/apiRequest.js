@@ -3,7 +3,8 @@ import cookies from 'react-cookies';
 
 export default function apiRequest(url, method = 'GET', data, headers) {
   if (!/^http[s]?/i.test(url)) {
-    // url = process.env.NEXT_PUBLIC_API_URL + url;
+    url = process.env.NEXT_PUBLIC_API_URL + url;
+    console.log(url);
   }
 
   const options = {
