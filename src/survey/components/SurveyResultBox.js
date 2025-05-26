@@ -84,9 +84,35 @@ const QRWrapper = styled.div`
 `;
 
 const SurveyResultBox = ({ responseUrl, ownerUrl }) => {
+  const fullUrl = (url) => location.origin + url;
+
   const copy = (url) => {
-    navigator.clipboard.writeText(location.origin + url);
-    alert('링크가 복사되었습니다!');
+    const full = fullUrl(url);
+
+    if (navigator.clipboard && location.protocol === 'https:') {
+      navigator.clipboard.writeText(full)
+        .then(() => alert('링크가 복사되었습니다!'))
+        .catch(() => fallbackCopy(full));
+    } else {
+      fallbackCopy(full);
+    }
+  };
+
+  const fallbackCopy = (text) => {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.top = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    try {
+      const success = document.execCommand('copy');
+      alert(success ? '링크가 복사되었습니다!' : '복사에 실패했습니다.');
+    } catch {
+      alert('복사에 실패했습니다.');
+    }
+    document.body.removeChild(textarea);
   };
 
   return (
@@ -99,20 +125,20 @@ const SurveyResultBox = ({ responseUrl, ownerUrl }) => {
 
         <SectionTitle><FiExternalLink /> 응답 링크</SectionTitle>
         <LinkRow>
-          <Code>{location.origin + responseUrl}</Code>
+          <Code>{fullUrl(responseUrl)}</Code>
           <CopyBtn onClick={() => copy(responseUrl)}>복사</CopyBtn>
         </LinkRow>
         <QRWrapper>
-          <QRCodeCanvas value={location.origin + responseUrl} size={120} />
+          <QRCodeCanvas value={fullUrl(responseUrl)} size={120} />
         </QRWrapper>
 
         <SectionTitle><FiBarChart2 /> 결과 조회 링크</SectionTitle>
         <LinkRow>
-          <Code>{location.origin + ownerUrl}</Code>
+          <Code>{fullUrl(ownerUrl)}</Code>
           <CopyBtn onClick={() => copy(ownerUrl)}>복사</CopyBtn>
         </LinkRow>
         <QRWrapper>
-          <QRCodeCanvas value={location.origin + ownerUrl} size={120} />
+          <QRCodeCanvas value={fullUrl(ownerUrl)} size={120} />
         </QRWrapper>
       </Box>
     </PageWrapper>
