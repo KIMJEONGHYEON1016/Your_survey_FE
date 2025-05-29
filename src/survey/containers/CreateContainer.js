@@ -38,7 +38,6 @@ const CreateContainer = () => {
 
   return (
     <Wrapper>
-      {!result && <Title>📝 설문지 생성</Title>}
 
       {!result && (
         <SurveyForm form={form} setForm={setForm} onSubmit={handleSubmit} />

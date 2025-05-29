@@ -3,17 +3,21 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FiPlus, FiPlusCircle, FiX, FiTrash2 } from 'react-icons/fi';
+import { BsFillPinAngleFill } from "react-icons/bs";
 
 const PageWrapper = styled.div`
-  background-color: #e8f5e9;
-  min-height: 100vh;
+  background-color: rgb(255, 255, 255);
   padding: 40px 0;
   font-family: 'SUIT', sans-serif;
+  border-radius: 8px;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.15);
 `;
 
 const SurveyContainer = styled.div`
   border-radius: 12px;
-  padding: 32px;
+  padding: 24px;
   max-width: 640px;
   margin: 0 auto;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
@@ -289,6 +293,20 @@ const SurveyForm = ({ form, setForm, onSubmit }) => {
 
   return (
     <PageWrapper>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '20px',
+          fontWeight: 'bold',
+          marginBottom: '12px',
+          gap: '8px',
+        }}
+      >
+        설문지 생성
+      </div>
+
       <SurveyContainer>
         <form
           onSubmit={(e) => {

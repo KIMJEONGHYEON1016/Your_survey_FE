@@ -2,12 +2,19 @@
 
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
+import {
+  MdCheckBoxOutlineBlank,
+  MdOutlineCheckBox,
+} from 'react-icons/md';
 
 const PageWrapper = styled.div`
-  background-color: #e8f5e9;
-  min-height: 100vh;
+  background-color: rgb(255, 255, 255);
   padding: 40px 0;
   font-family: 'SUIT', sans-serif;
+  border-radius: 8px;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.15);
 `;
 
 const FormWrapper = styled.form`
@@ -61,6 +68,18 @@ const OptionLabel = styled.label`
   align-items: center;
   gap: 10px;
   font-size: 15px;
+  cursor: pointer;
+  color: #333;
+`;
+
+const HiddenInput = styled.input`
+  display: none;
+`;
+
+const IconWrapper = styled.span`
+  font-size: 20px;
+  display: flex;
+  align-items: center;
 `;
 
 const SubmitButton = styled.button`
@@ -95,7 +114,7 @@ export default function ResponseForm({
 
   const isSelected = (questionId, option) => {
     const res = getAnswer(questionId);
-    return Array.isArray(res) && res.includes(option);
+    return Array.isArray(res) ? res.includes(option) : res === option;
   };
 
   const handleMultiChange = (questionId, option) => {
@@ -147,32 +166,34 @@ export default function ResponseForm({
               <OptionList>
                 {q.options.map((opt, optIdx) => {
                   const selectedCount = countSelected(q.id);
+                  const selected = isSelected(q.id, opt);
                   const disabled =
                     q.allowMultiple &&
                     q.multipleLimit != null &&
-                    !isSelected(q.id, opt) &&
+                    !selected &&
                     selectedCount >= q.multipleLimit;
 
                   return (
                     <OptionLabel key={optIdx}>
-                      {q.allowMultiple ? (
-                        <input
-                          type="checkbox"
-                          name={`question-${q.id}`}
-                          value={opt}
-                          checked={isSelected(q.id, opt)}
-                          disabled={disabled}
-                          onChange={() => handleMultiChange(q.id, opt)}
-                        />
-                      ) : (
-                        <input
-                          type="radio"
-                          name={`question-${q.id}`}
-                          value={opt}
-                          checked={getAnswer(q.id) === opt}
-                          onChange={() => onChange(q.id, opt)}
-                        />
-                      )}
+                      <HiddenInput
+                        type={q.allowMultiple ? 'checkbox' : 'radio'}
+                        name={`question-${q.id}`}
+                        value={opt}
+                        checked={selected}
+                        disabled={disabled}
+                        onChange={() =>
+                          q.allowMultiple
+                            ? handleMultiChange(q.id, opt)
+                            : onChange(q.id, opt)
+                        }
+                      />
+                      <IconWrapper>
+                        {selected ? (
+                          <MdOutlineCheckBox />
+                        ) : (
+                          <MdCheckBoxOutlineBlank />
+                        )}
+                      </IconWrapper>
                       {opt}
                     </OptionLabel>
                   );

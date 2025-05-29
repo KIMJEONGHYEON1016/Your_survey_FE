@@ -4,12 +4,19 @@ import React from 'react';
 import styled from 'styled-components';
 
 const PageWrapper = styled.div`
-  background-color: #ddf5ddc0; 
   min-height: 100vh;
   padding: 40px 0;
   font-family: 'SUIT', sans-serif;
+  background: linear-gradient(
+    to bottom,
+    #00c73c 0vh,
+    #00c73c 13vh,
+    #c5e9cd 13vh,
+    #dbffe3 100vh
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 `;
-
 
 const Wrapper = styled.section`
   max-width: 700px;
@@ -17,7 +24,8 @@ const Wrapper = styled.section`
   background: #fff;
   padding: 32px;
   border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.15);
 `;
 
 const Title = styled.h1`
@@ -25,6 +33,7 @@ const Title = styled.h1`
   font-weight: bold;
   text-align: center;
   margin-bottom: 40px;
+
 `;
 
 const QuestionCard = styled.div`
@@ -84,7 +93,10 @@ const SurveyResultViewer = ({ survey }) => {
 
             {q.type === 'MULTIPLE_CHOICE' &&
               Object.entries(q.optionStats).map(([opt, count], i) => {
-                const total = Object.values(q.optionStats).reduce((a, b) => a + b, 0);
+                const total = Object.values(q.optionStats).reduce(
+                  (a, b) => a + b,
+                  0
+                );
                 const percent = total > 0 ? (count / total) * 100 : 0;
 
                 return (
