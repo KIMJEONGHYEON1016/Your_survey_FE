@@ -2,6 +2,26 @@
 
 import React from 'react';
 import styled from 'styled-components';
+import { Bar, Doughnut } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+} from 'chart.js';
+import { FcBullish } from 'react-icons/fc';
+
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+);
 
 const PageWrapper = styled.div`
   min-height: 100vh;
@@ -24,8 +44,7 @@ const Wrapper = styled.section`
   background: #fff;
   padding: 32px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1),
-    0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 8px 24px rgba(0, 0, 0, 0.15);
 `;
 
 const Title = styled.h1`
@@ -33,49 +52,63 @@ const Title = styled.h1`
   font-weight: bold;
   text-align: center;
   margin-bottom: 40px;
-
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 `;
 
-const QuestionCard = styled.div`
-  margin-bottom: 32px;
-  padding: 20px;
-  background: #fff;
-  border-radius: 10px;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+const QuestionWrapper = styled.div`
+  margin-bottom: 48px;
 `;
 
-const QuestionTitle = styled.p`
+const QuestionTitle = styled.h2`
   font-size: 18px;
   font-weight: 700;
-  color: #212121;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
+  color: #222;
 `;
 
-const AnswerList = styled.ul`
-  padding-left: 20px;
-  list-style: disc;
+const ChartRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+  }
 `;
 
-const StatLabel = styled.div`
-  font-size: 14px;
-  margin-bottom: 4px;
-  color: #555;
+const ChartBox = styled.div`
+  flex: 1;
+  min-width: 300px;
+  height: 300px;
 `;
 
-const StatBar = styled.div`
-  height: 10px;
-  background: #e0e0e0;
-  border-radius: 5px;
-  overflow: hidden;
+const AnswerListBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 `;
 
-const StatFill = styled.div`
-  height: 100%;
-  background: #00c853;
-  width: ${(props) => props.percent}%;
-  transition: width 0.4s ease;
+const AnswerLine = styled.div`
+  font-size: 15px;
+  color: #444;
+  padding-left: 8px;
+  border-left: 2px solid #a5d6a7;
 `;
+
+const LabelColors = [
+  '#a8e6cf', // 민트
+  '#b2ebf2', // 밝은 하늘
+  '#c5e1a5', // 연녹색
+  '#aed581', // 좀 더 진한 연두
+  '#80cbc4', // 청록
+  '#dcedc1', // 라이트 연두
+  '#b3e5fc', // 파스텔 블루
+  '#ffccbc', // 부드러운 살구
+];
 
 const SurveyResultViewer = ({ survey }) => {
   if (!survey) return null;
@@ -83,43 +116,106 @@ const SurveyResultViewer = ({ survey }) => {
   return (
     <PageWrapper>
       <Wrapper>
-        <Title>📊 {survey.title} - 결과</Title>
+        <Title>
+          <FcBullish size={28} />
+          {survey.title} - 결과
+        </Title>
 
-        {survey.questions.map((q, idx) => (
-          <QuestionCard key={idx}>
-            <QuestionTitle>
-              {idx + 1}. {q.content}
-            </QuestionTitle>
+        {survey.questions.map((q, idx) => {
+          if (q.type === 'MULTIPLE_CHOICE') {
+            const labels = Object.keys(q.optionStats);
+            const values = Object.values(q.optionStats);
+            const backgroundColor = labels.map(
+              (_, i) => LabelColors[i % LabelColors.length],
+            );
 
-            {q.type === 'MULTIPLE_CHOICE' &&
-              Object.entries(q.optionStats).map(([opt, count], i) => {
-                const total = Object.values(q.optionStats).reduce(
-                  (a, b) => a + b,
-                  0
-                );
-                const percent = total > 0 ? (count / total) * 100 : 0;
+            const barData = {
+              labels,
+              datasets: [
+                {
+                  label: '응답 수',
+                  data: values,
+                  backgroundColor,
+                },
+              ],
+            };
 
-                return (
-                  <div key={i} style={{ marginBottom: '16px' }}>
-                    <StatLabel>
-                      {opt} - {count}명
-                    </StatLabel>
-                    <StatBar>
-                      <StatFill percent={percent} />
-                    </StatBar>
-                  </div>
-                );
-              })}
+            const doughnutData = {
+              labels,
+              datasets: [
+                {
+                  data: values,
+                  backgroundColor,
+                  borderWidth: 1,
+                },
+              ],
+            };
 
-            {q.type === 'SHORT_TEXT' && (
-              <AnswerList>
-                {q.shortAnswers.map((ans, i) => (
-                  <li key={i}>- {ans}</li>
-                ))}
-              </AnswerList>
-            )}
-          </QuestionCard>
-        ))}
+            return (
+              <QuestionWrapper key={idx}>
+                <QuestionTitle>Q. {q.content}</QuestionTitle>
+
+                <ChartRow>
+                  <ChartBox>
+                    <Bar
+                      data={barData}
+                      options={{
+                        indexAxis: 'y',
+                        responsive: true,
+                        plugins: {
+                          legend: { display: false },
+                        },
+                        scales: {
+                          x: {
+                            ticks: { precision: 0 },
+                            beginAtZero: true,
+                          },
+                          y: {
+                            ticks: { font: { size: 14 } },
+                          },
+                        },
+                      }}
+                    />
+                  </ChartBox>
+
+                  <ChartBox>
+                    <Doughnut
+                      data={doughnutData}
+                      options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                          legend: {
+                            position: 'bottom',
+                            labels: {
+                              font: { size: 13 },
+                            },
+                          },
+                        },
+                        cutout: '60%',
+                      }}
+                    />
+                  </ChartBox>
+                </ChartRow>
+              </QuestionWrapper>
+            );
+          }
+
+          if (q.type === 'SHORT_TEXT') {
+            return (
+              <QuestionWrapper key={idx}>
+                <QuestionTitle>Q. {q.content}</QuestionTitle>
+                <AnswerListBox>
+                  {q.shortAnswers.map((ans, i) => (
+                    <AnswerLine key={i}>{ans}</AnswerLine>
+                  ))}
+                </AnswerListBox>
+              </QuestionWrapper>
+            );
+          }
+
+          return null;
+        })}
       </Wrapper>
     </PageWrapper>
   );

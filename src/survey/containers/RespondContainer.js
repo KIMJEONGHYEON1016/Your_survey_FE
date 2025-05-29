@@ -21,6 +21,7 @@ const Title = styled.h1`
 const RespondContainer = ({ token }) => {
   const [survey, setSurvey] = useState(null);
   const [answers, setAnswers] = useState([]);
+  const [isSubmitted, setIsSubmitted] = useState(false); // ✅ 제출 상태 관리
 
   useEffect(() => {
     const fetchSurvey = async () => {
@@ -55,13 +56,14 @@ const RespondContainer = ({ token }) => {
 
   return (
     <Wrapper>
-      <Title>{survey.title}</Title>
+      {!isSubmitted && <Title>{survey.title}</Title>}
 
       <ResponseForm
         questions={survey.questions}
         answers={answers}
         onChange={handleChange}
         onSubmit={handleSubmit}
+        onSubmitted={() => setIsSubmitted(true)} // ✅ 제출 완료 콜백
       />
     </Wrapper>
   );

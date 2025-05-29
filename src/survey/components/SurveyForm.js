@@ -141,6 +141,13 @@ const RemoveOptionBtn = styled.button`
   }
 `;
 
+const AddOptionBtnWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+`;
+
 const AddOptionBtn = styled.button`
   display: flex;
   align-items: center;
@@ -150,7 +157,6 @@ const AddOptionBtn = styled.button`
   border: 1px solid #90caf9;
   font-size: 14px;
   padding: 10px;
-  margin-top: 12px;
   border-radius: 6px;
   cursor: pointer;
   gap: 6px;
@@ -158,6 +164,12 @@ const AddOptionBtn = styled.button`
   &:hover {
     background: #bbdefb;
   }
+`;
+
+const OptionLimitText = styled.span`
+  font-size: 13px;
+  color:rgb(212, 9, 9);
+  opacity: 0.8;
 `;
 
 const ExtraControls = styled.div`
@@ -298,7 +310,7 @@ const SurveyForm = ({ form, setForm, onSubmit }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '20px',
+          fontSize: '28px',
           fontWeight: 'bold',
           marginBottom: '12px',
           gap: '8px',
@@ -325,7 +337,7 @@ const SurveyForm = ({ form, setForm, onSubmit }) => {
             <QuestionCardWrapper key={idx}>
               <QuestionCard>
                 <QuestionHeader>
-                  <QuestionNumber>{idx + 1}.</QuestionNumber>
+                  <QuestionNumber>Q.</QuestionNumber>
                   <QuestionControls>
                     <Select
                       value={q.type}
@@ -378,10 +390,26 @@ const SurveyForm = ({ form, setForm, onSubmit }) => {
 
                 {q.type === 'MULTIPLE_CHOICE' && (
                   <>
-                    <AddOptionBtn type="button" onClick={() => addOption(idx)}>
-                      <FiPlusCircle />
-                      선택지 추가
-                    </AddOptionBtn>
+                    <AddOptionBtnWrapper>
+                      <AddOptionBtn
+                        type="button"
+                        onClick={() => {
+                          if (q.options.length < 8) addOption(idx);
+                        }}
+                        disabled={q.options.length >= 8}
+                        style={{
+                          opacity: q.options.length >= 8 ? 0.5 : 1,
+                          cursor: q.options.length >= 8 ? 'not-allowed' : 'pointer',
+                        }}
+                      >
+                        <FiPlusCircle />
+                        선택지 추가
+                      </AddOptionBtn>
+
+                      {q.options.length >= 8 && (
+                        <OptionLimitText>선택항목 최대치는 8개입니다.</OptionLimitText>
+                      )}
+                    </AddOptionBtnWrapper>
 
                     <ExtraControls>
                       <span>복수 선택</span>
@@ -438,7 +466,7 @@ const SurveyForm = ({ form, setForm, onSubmit }) => {
             </QuestionCardWrapper>
           ))}
 
-          <SubmitButton type="submit">설문 생성</SubmitButton>
+          <SubmitButton type="submit">완료</SubmitButton>
         </form>
       </SurveyContainer>
     </PageWrapper>

@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import {
-  MdCheckBoxOutlineBlank,
-  MdOutlineCheckBox,
-} from 'react-icons/md';
+import { MdCheckBoxOutlineBlank, MdOutlineCheckBox } from 'react-icons/md';
+import Link from 'next/link';
 
 const PageWrapper = styled.div`
   background-color: rgb(255, 255, 255);
@@ -99,12 +97,39 @@ const SubmitButton = styled.button`
   }
 `;
 
+const MessageBox = styled.div`
+  text-align: center;
+  padding: 64px 20px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #2e7d32;
+`;
+
+const LinkButton = styled.a`
+  display: inline-block;
+  margin-top: 24px;
+  background: #00c853;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  text-decoration: none;
+
+  &:hover {
+    background: #00b44a;
+  }
+`;
+
 export default function ResponseForm({
   questions,
   answers,
   onChange,
   onSubmit,
+  onSubmitted, // ✅ 콜백 추가
 }) {
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
   useEffect(() => {
     console.log('Debug questions:', questions);
   }, [questions]);
@@ -134,77 +159,95 @@ export default function ResponseForm({
     return Array.isArray(res) ? res.length : 0;
   };
 
+  const handleSubmit = () => {
+    onSubmit(); // 응답 저장
+    onSubmitted?.(); // ✅ 상위 컨테이너에 제출 완료 알림
+    setIsSubmitted(true); // 내부 메시지용 상태
+  };
+
   return (
     <PageWrapper>
-      <FormWrapper
-        onSubmit={(e) => {
-          e.preventDefault();
-          onSubmit();
-        }}
-      >
-        {questions.map((q, idx) => (
-          <QuestionBox key={q.id}>
-            <QuestionTitle>
-              <span>
-                {idx + 1}. {q.content}
-              </span>
-              {q.allowMultiple && q.multipleLimit && (
-                <LimitHint>최대 {q.multipleLimit}개 선택 가능</LimitHint>
+      {isSubmitted ? (
+        <FormWrapper>
+          <MessageBox>
+            응답해주셔서 감사합니다!
+            <br />
+            <Link href="/" passHref legacyBehavior>
+              <LinkButton>설문지 생성하기</LinkButton>
+            </Link>
+          </MessageBox>
+        </FormWrapper>
+      ) : (
+        <FormWrapper
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+        >
+          {questions.map((q, idx) => (
+            <QuestionBox key={q.id}>
+              <QuestionTitle>
+                <span>
+                  {idx + 1}. {q.content}
+                </span>
+                {q.allowMultiple && q.multipleLimit && (
+                  <LimitHint>최대 {q.multipleLimit}개 선택 가능</LimitHint>
+                )}
+              </QuestionTitle>
+
+              {q.type === 'SHORT_TEXT' && (
+                <TextInput
+                  type="text"
+                  value={getAnswer(q.id)}
+                  onChange={(e) => onChange(q.id, e.target.value)}
+                  placeholder="답변을 입력하세요"
+                />
               )}
-            </QuestionTitle>
 
-            {q.type === 'SHORT_TEXT' && (
-              <TextInput
-                type="text"
-                value={getAnswer(q.id)}
-                onChange={(e) => onChange(q.id, e.target.value)}
-                placeholder="답변을 입력하세요"
-              />
-            )}
+              {q.type === 'MULTIPLE_CHOICE' && (
+                <OptionList>
+                  {q.options.map((opt, optIdx) => {
+                    const selectedCount = countSelected(q.id);
+                    const selected = isSelected(q.id, opt);
+                    const disabled =
+                      q.allowMultiple &&
+                      q.multipleLimit != null &&
+                      !selected &&
+                      selectedCount >= q.multipleLimit;
 
-            {q.type === 'MULTIPLE_CHOICE' && (
-              <OptionList>
-                {q.options.map((opt, optIdx) => {
-                  const selectedCount = countSelected(q.id);
-                  const selected = isSelected(q.id, opt);
-                  const disabled =
-                    q.allowMultiple &&
-                    q.multipleLimit != null &&
-                    !selected &&
-                    selectedCount >= q.multipleLimit;
+                    return (
+                      <OptionLabel key={optIdx}>
+                        <HiddenInput
+                          type={q.allowMultiple ? 'checkbox' : 'radio'}
+                          name={`question-${q.id}`}
+                          value={opt}
+                          checked={selected}
+                          disabled={disabled}
+                          onChange={() =>
+                            q.allowMultiple
+                              ? handleMultiChange(q.id, opt)
+                              : onChange(q.id, opt)
+                          }
+                        />
+                        <IconWrapper>
+                          {selected ? (
+                            <MdOutlineCheckBox />
+                          ) : (
+                            <MdCheckBoxOutlineBlank />
+                          )}
+                        </IconWrapper>
+                        {opt}
+                      </OptionLabel>
+                    );
+                  })}
+                </OptionList>
+              )}
+            </QuestionBox>
+          ))}
 
-                  return (
-                    <OptionLabel key={optIdx}>
-                      <HiddenInput
-                        type={q.allowMultiple ? 'checkbox' : 'radio'}
-                        name={`question-${q.id}`}
-                        value={opt}
-                        checked={selected}
-                        disabled={disabled}
-                        onChange={() =>
-                          q.allowMultiple
-                            ? handleMultiChange(q.id, opt)
-                            : onChange(q.id, opt)
-                        }
-                      />
-                      <IconWrapper>
-                        {selected ? (
-                          <MdOutlineCheckBox />
-                        ) : (
-                          <MdCheckBoxOutlineBlank />
-                        )}
-                      </IconWrapper>
-                      {opt}
-                    </OptionLabel>
-                  );
-                })}
-              </OptionList>
-            )}
-          </QuestionBox>
-        ))}
-
-        <SubmitButton type="submit">제출</SubmitButton>
-      </FormWrapper>
+          <SubmitButton type="submit">제출</SubmitButton>
+        </FormWrapper>
+      )}
     </PageWrapper>
   );
 }
