@@ -1,9 +1,4 @@
-# *
 User-agent: *
 Allow: /
 
-# Host
-Host: http://your-survey.xyz
-
-# Sitemaps
 Sitemap: http://your-survey.xyz/sitemap.xml
