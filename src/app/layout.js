@@ -10,7 +10,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ko">
       <head>
-        {/* ✅ SUIT 폰트 CDN import */}
         <link
           href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css"
           rel="stylesheet"

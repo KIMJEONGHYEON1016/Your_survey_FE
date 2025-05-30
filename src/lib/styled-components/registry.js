@@ -8,9 +8,12 @@ export function StyledComponentsRegistry({ children }) {
   const [sheet] = useState(() => new ServerStyleSheet());
 
   useServerInsertedHTML(() => {
-    const styles = sheet.getStyleElement();
-    sheet.instance.clearTag();
-    return <>{styles}</>;
+    try {
+      const styles = sheet.getStyleElement();
+      return <>{styles}</>;
+    } finally {
+      sheet.instance.seal(); // ✅ seal()이 중요: 누수 방지
+    }
   });
 
   return <StyleSheetManager sheet={sheet.instance}>{children}</StyleSheetManager>;
