@@ -20,7 +20,7 @@ const ManageContainer = ({ token }) => {
     fetchResult();
   }, [token]);
 
-  if (!survey) return <div>Loading...</div>;
+  if (!survey) return <div></div>;
 
   return <SurveyResultViewer survey={survey} />;
 };

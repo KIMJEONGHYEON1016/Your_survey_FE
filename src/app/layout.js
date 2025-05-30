@@ -1,5 +1,4 @@
 import './globals.css';
-import StyledComponentsRegistry from '../lib/styled-components/registry';
 
 export const metadata = {
   title: '설문조사',
@@ -15,11 +14,7 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-      <body>
-        <StyledComponentsRegistry>
-          {children}
-        </StyledComponentsRegistry>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

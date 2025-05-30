@@ -52,7 +52,7 @@ const RespondContainer = ({ token }) => {
     }
   };
 
-  if (!survey) return <div>Loading...</div>;
+  if (!survey) return <div></div>;
 
   return (
     <Wrapper>

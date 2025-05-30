@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import SurveyForm from '@/survey/components/SurveyForm';
 import SurveyResultBox from '@/survey/components/SurveyResultBox';
@@ -26,6 +26,16 @@ const CreateContainer = () => {
   });
 
   const [result, setResult] = useState(null);
+  const [isReady, setIsReady] = useState(false); // ✅ 스타일 적용 전 loading 상태
+
+  useEffect(() => {
+    // 다음 렌더 프레임에서 isReady를 true로 설정
+    const timer = requestAnimationFrame(() => {
+      setIsReady(true);
+    });
+
+    return () => cancelAnimationFrame(timer);
+  }, []);
 
   const handleSubmit = async () => {
     try {
@@ -36,13 +46,13 @@ const CreateContainer = () => {
     }
   };
 
+  if (!isReady) return <div style={{ textAlign: 'center', marginTop: '100px' }}></div>;
+
   return (
     <Wrapper>
-
       {!result && (
         <SurveyForm form={form} setForm={setForm} onSubmit={handleSubmit} />
       )}
-
       {result && (
         <SurveyResultBox
           responseUrl={result.responseUrl}
