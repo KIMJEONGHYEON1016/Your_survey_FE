@@ -1,5 +1,5 @@
 import './globals.css';
-import { StyledComponentsRegistry } from '../lib/styled-components/registry';
+import StyledComponentsRegistry from '../lib/styled-components/registry';
 
 export const metadata = {
   title: '설문조사',

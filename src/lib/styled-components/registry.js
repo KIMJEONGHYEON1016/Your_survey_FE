@@ -1,20 +1,23 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useServerInsertedHTML } from 'next/navigation';
+import React, { useMemo } from 'react';
 import { ServerStyleSheet, StyleSheetManager } from 'styled-components';
+import { useServerInsertedHTML } from 'next/navigation';
 
-export function StyledComponentsRegistry({ children }) {
-  const [sheet] = useState(() => new ServerStyleSheet());
+export default function StyledComponentsRegistry({ children }) {
+  const [sheet] = useMemo(() => {
+    const sheet = new ServerStyleSheet();
+    return [sheet];
+  }, []);
 
   useServerInsertedHTML(() => {
-    try {
-      const styles = sheet.getStyleElement();
-      return <>{styles}</>;
-    } finally {
-      sheet.instance.seal(); // ✅ seal()이 중요: 누수 방지
-    }
+    const styles = sheet.getStyleElement();
+    return <>{styles}</>;
   });
 
-  return <StyleSheetManager sheet={sheet.instance}>{children}</StyleSheetManager>;
+  return (
+    <StyleSheetManager sheet={sheet.instance}>
+      {children}
+    </StyleSheetManager>
+  );
 }
