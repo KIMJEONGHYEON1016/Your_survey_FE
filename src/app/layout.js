@@ -1,5 +1,6 @@
 import './globals.css';
 import FirebaseClientInit from '@/survey/libs/FirebaseClientInit';
+import SideAdFit from '@/survey/components/SideAdFit';
 
 export const metadata = {
   title: '설문조사',
@@ -16,7 +17,8 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
-        <FirebaseClientInit /> {/* ✅ Firebase 초기화는 클라이언트에서 */}
+        <FirebaseClientInit />
+        <SideAdFit /> {/* ✅ 광고 컴포넌트 삽입 */}
         {children}
       </body>
     </html>
