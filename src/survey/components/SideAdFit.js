@@ -24,7 +24,7 @@ export default function SideAdFit() {
         <ins
           className="kakao_ad_area"
           style={{ display: 'block', width: '160px', height: '600px' }}
-          data-ad-unit="DAN-gsYH23NQM5ey3Yh1" // ← 본인 광고단위 ID
+          data-ad-unit="DAN-gsYH23NQM5ey3Yh1" // ✅ 왼쪽 광고단위
           data-ad-width="160"
           data-ad-height="600"
         ></ins>
@@ -44,7 +44,7 @@ export default function SideAdFit() {
         <ins
           className="kakao_ad_area"
           style={{ display: 'block', width: '160px', height: '600px' }}
-          data-ad-unit="DAN-gsYH23NQM5ey3Yh1" // ← 본인 광고단위 ID
+          data-ad-unit="DAN-v6b843mqcXdzJ4gb" // ✅ 오른쪽 광고단위
           data-ad-width="160"
           data-ad-height="600"
         ></ins>
